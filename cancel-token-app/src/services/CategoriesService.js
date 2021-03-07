@@ -1,18 +1,39 @@
+import axios from 'axios'
 import request from './BaseService'
 import { constants } from '../shared/constants'
 
 function getAll(size = 5) {
-    return request({
-        url: constants.paths.categories + '?size=' + size.toString(),
-        method: 'GET',
+    const { CancelToken } = axios
+    let cancel
+
+    const cancelToken = new CancelToken((c) => {
+        cancel = c
     })
+    return [
+        request({
+            url: constants.paths.categories + '?size=' + size.toString(),
+            method: 'GET',
+            cancelToken,
+        }),
+        cancel,
+    ]
 }
 
 function get(id) {
-    return request({
-        url: constants.paths.categories.replace('{id}', id.toString()),
-        method: 'GET',
+    const { CancelToken } = axios
+    let cancel
+
+    const cancelToken = new CancelToken((c) => {
+        cancel = c
     })
+    return [
+        request({
+            url: constants.paths.categories.replace('{id}', id.toString()),
+            method: 'GET',
+            cancelToken,
+        }),
+        cancel,
+    ]
 }
 
 const CategoriesService = {

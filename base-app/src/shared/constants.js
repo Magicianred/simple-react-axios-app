@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/prefer-default-export
 export const constants = {
     api: {
-        url: 'https://localhost:44342',
+        url: 'https://localhost:5001',
     },
     paths: {
         posts: 'api/posts',

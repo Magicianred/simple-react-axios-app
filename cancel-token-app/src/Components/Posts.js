@@ -1,16 +1,22 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import PostsService from '../services/PostsService'
 
-const App = () => {
+const Posts = () => {
     const [loading, setLoading] = useState(false)
     const [posts, setPosts] = useState([])
     const [hasError, setHasError] = useState(null)
-    const [cancelToken, setCancelToken] = useState(() => console.log('not set'))
+
+    // handle cancel token
+    const cancelTokenRef = useRef()
+    const [cancelToken, setCancelToken] = useState()
 
     const loadMore = () => {
         setLoading(true)
         const [promise, cancelRequest] = PostsService.getAll()
+        setCancelToken(() => {
+            return cancelRequest
+        })
         promise
             .then((resp) => {
                 setLoading(false)
@@ -23,20 +29,21 @@ const App = () => {
                 setLoading(false)
                 setHasError(err)
             })
-        console.log({ cancelRequest })
-        setCancelToken(() => cancelRequest)
     }
 
     useEffect(() => {
         loadMore()
 
         return function cleanup() {
-            console.log({ cancelToken })
-            if (cancelToken) {
-                cancelToken()
+            if (cancelTokenRef && cancelTokenRef.current) {
+                cancelTokenRef.current()
             }
         }
     }, [])
+
+    useEffect(() => {
+        cancelTokenRef.current = cancelToken
+    }, [cancelToken])
 
     return (
         <div>
@@ -61,4 +68,4 @@ const App = () => {
     )
 }
 
-export default App
+export default Posts

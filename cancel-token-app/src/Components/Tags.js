@@ -1,16 +1,19 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import TagsService from '../services/TagsService'
 
-const App = () => {
+const Tags = () => {
     const [loading, setLoading] = useState(false)
     const [tags, setTags] = useState([])
     const [hasError, setHasError] = useState(null)
-    const [cancelToken, setCancelToken] = useState(null)
+
+    // handle cancel token
+    const cancelTokenRef = useRef()
+    const [cancelToken, setCancelToken] = useState()
 
     const loadMore = () => {
         setLoading(true)
-        const [promise, requestToken] = TagsService.getAll()
+        const [promise, cancelRequest] = TagsService.getAll()
         promise
             .then((resp) => {
                 setLoading(false)
@@ -23,19 +26,22 @@ const App = () => {
                 setLoading(false)
                 setHasError(err)
             })
-        setCancelToken(requestToken)
+        setCancelToken(() => cancelRequest)
     }
 
     useEffect(() => {
         loadMore()
 
         return function cleanup() {
-            if (cancelToken) {
-                console.log('Tags cleanup')
-                cancelToken.cancel('Request abort')
+            if (cancelTokenRef && cancelTokenRef.current) {
+                cancelTokenRef.current()
             }
         }
     }, [])
+
+    useEffect(() => {
+        cancelTokenRef.current = cancelToken
+    }, [cancelToken])
 
     return (
         <div>
@@ -55,4 +61,4 @@ const App = () => {
     )
 }
 
-export default App
+export default Tags
