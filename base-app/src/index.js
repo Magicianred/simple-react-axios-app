@@ -6,7 +6,7 @@ import App from './Components/App'
 // import webpackLogo from './images/webpack-logo.svg'
 
 // Test import of styles
-import './styles/index.scss'
+// import './styles/index.scss'
 
 // Appending to the DOM
 ReactDOM.render(<App />, document.getElementById('root'))
